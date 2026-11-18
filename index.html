@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>古文絵巻道場 ― 文法で進む絵巻の旅</title>
+<meta name="description" content="古典文法の4択問題で物の怪をしずめ、絵巻の中を旅する道場。全8巻・36の関。">
+<style>
+:root{
+  --bg:#efe6d0; --paper:#fbf6e9; --paper2:#f1e7cc; --ink:#2b2418; --soft:#6a5f48; --line:#cdbb8e;
+  --gunjo:#1f4a8a; --gunjo-deep:#143663; --kin:#a8821f; --shu:#b93d24; --rokusho:#2f7f6b;
+  --ok-bg:#e1f0e7; --ng-bg:#f8e3dc; --on-gunjo:#fffaf0; --shadow:rgba(43,36,24,.16); --mk:#3f8a4f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12182a; --paper:#1b2238; --paper2:#252d49; --ink:#ece4cf; --soft:#aaa189; --line:#3a4468;
+    --gunjo:#8fb0ea; --gunjo-deep:#c3d4f5; --kin:#dcb657; --shu:#ee917d; --rokusho:#7cc7b2;
+    --ok-bg:#1b3329; --ng-bg:#3b2420; --on-gunjo:#12182a; --shadow:rgba(0,0,0,.45);
+  }
+}
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-size:16px; line-height:1.75;
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif; -webkit-font-smoothing:antialiased; }
+.wrap{ max-width:720px; margin:0 auto; padding:16px 16px 96px; }
+h1,h2,h3,.mincho{ font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif; }
+header.top{ text-align:center; padding:8px 0 4px; }
+header.top h1{ margin:0; font-size:1.7rem; letter-spacing:.12em; color:var(--gunjo-deep); }
+header.top h1 span{ display:inline-block; border-top:3px double var(--kin); border-bottom:3px double var(--kin); padding:2px 14px; }
+header.top p{ margin:6px 0 10px; color:var(--soft); font-size:.9rem; }
+body.in-battle header.top{ display:none; }
+nav.sister{ display:flex; justify-content:center; gap:6px; flex-wrap:wrap; margin:0 0 14px; }
+nav.sister a, nav.sister button{ display:inline-flex; align-items:center; min-height:44px; font-size:.9rem; padding:6px 14px; border-radius:999px;
+  border:1px solid var(--line); color:var(--ink); text-decoration:none; background:var(--paper); }
+nav.sister a[aria-current]{ background:var(--gunjo); border-color:var(--gunjo); color:var(--on-gunjo); font-weight:700; }
+button{ font:inherit; color:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+button:focus-visible,a:focus-visible,summary:focus-visible{ outline:3px solid var(--kin); outline-offset:2px; }
+.card{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:14px 16px; box-shadow:0 2px 8px var(--shadow); margin:0 0 14px; }
+.btn{ display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:10px 20px; border-radius:12px;
+  border:1px solid var(--line); background:var(--paper); font-weight:700; font-size:1rem; transition:transform .08s; }
+.btn:active, .choices button:active, .node:active .dot{ transform:scale(.96); }
+.btn.main{ background:var(--gunjo); border-color:var(--gunjo); color:var(--on-gunjo); }
+.btn.wide{ width:100%; }
+[hidden]{ display:none !important; }
+
+/* ---- 旅の記録 ---- */
+.kiroku{ display:flex; gap:12px; align-items:center; }
+.kiroku .aibo{ width:76px; height:76px; flex:none; border:0; background:var(--paper2); border-radius:50%; padding:4px; }
+.kiroku .aibo svg{ width:100%; height:100%; display:block; animation:bob 1.8s ease-in-out infinite; }
+.kiroku .txt{ flex:1; min-width:0; }
+.kiroku .name{ font-weight:700; font-size:1rem; }
+.kiroku .sub{ color:var(--soft); font-size:.9rem; }
+.tegata{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+.tegata span{ width:34px; height:34px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; font-size:1rem;
+  border:2px dashed var(--line); color:var(--line); font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:700; }
+.tegata span.got{ border:2px solid var(--shu); color:var(--shu); background:var(--paper); transform:rotate(-4deg); }
+details.story summary{ min-height:44px; display:flex; align-items:center; font-weight:700; cursor:pointer; color:var(--gunjo-deep); }
+details.story p{ margin:4px 0 2px; }
+
+/* ---- 巻えらび・絵巻 ---- */
+.chips{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:0 0 10px; }
+.chips button{ min-height:48px; border-radius:10px; border:1px solid var(--line); background:var(--paper); font-size:.9rem; font-weight:700; padding:4px 2px; line-height:1.3; }
+.chips button small{ display:block; font-size:.875rem; font-weight:400; color:var(--soft); }
+.chips button[aria-pressed="true"]{ background:var(--gunjo); border-color:var(--gunjo); color:var(--on-gunjo); }
+.chips button[aria-pressed="true"] small{ color:var(--on-gunjo); }
+.chips button.locked{ opacity:.55; }
+.maki-head h2{ margin:0; font-size:1.25rem; color:var(--gunjo-deep); }
+.maki-head .theme{ color:var(--soft); font-size:.9rem; }
+.maki-head p{ margin:6px 0 0; }
+.scroll-frame{ position:relative; margin:0 0 14px; border-top:10px solid var(--gunjo-deep); border-bottom:10px solid var(--gunjo-deep);
+  border-radius:4px; box-shadow:0 2px 8px var(--shadow); background:var(--paper); }
+.scroll-frame:before,.scroll-frame:after{ content:""; position:absolute; left:0; right:0; height:3px; background:var(--kin); z-index:2; }
+.scroll-frame:before{ top:0; } .scroll-frame:after{ bottom:0; }
+.emaki{ overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; direction:rtl; }
+.emaki-inner{ position:relative; height:244px; direction:ltr; }
+.emaki-inner svg.bgart{ position:absolute; inset:0; width:100%; height:100%; }
+.bgart .drift{ animation:drift 9s ease-in-out infinite alternate; }
+.bgart .drift2{ animation:drift 13s ease-in-out infinite alternate-reverse; }
+.bgart .sway{ animation:sway 5s ease-in-out infinite alternate; transform-origin:50% 100%; transform-box:fill-box; }
+.node{ position:absolute; width:100px; margin-right:-50px; text-align:center; border:0; background:none; padding:0; min-height:44px; }
+.node .dot{ width:60px; height:60px; margin:0 auto; border-radius:50%; background:var(--paper); border:3px solid var(--line); display:flex; align-items:center; justify-content:center;
+  font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:700; font-size:1.3rem; color:var(--soft); box-shadow:0 2px 5px var(--shadow); transition:transform .08s; }
+.node .dot svg{ width:46px; height:46px; }
+.node.open .dot{ border-color:var(--gunjo); color:var(--gunjo-deep); }
+.node.done .dot{ border-color:var(--kin); }
+.node.boss .dot{ width:72px; height:72px; margin-top:-6px; }
+.node.sel .dot{ box-shadow:0 0 0 4px var(--kin), 0 2px 5px var(--shadow); }
+.node.now .dot{ animation:pulse 1.4s ease-in-out infinite; }
+.node.boss.open .dot svg, .node.now .dot svg{ animation:float 2.2s ease-in-out infinite; }
+.node.fresh .dot{ animation:unlock .9s ease-out; }
+.node .lab{ display:block; margin-top:4px; font-size:.875rem; font-weight:700; line-height:1.3; }
+.node .st{ display:block; font-size:.875rem; color:var(--kin); letter-spacing:.05em; line-height:1.2; min-height:1.2em; }
+.node.lock .lab{ color:var(--soft); font-weight:400; }
+.walker{ position:absolute; width:44px; height:44px; margin-right:-22px; pointer-events:none; z-index:3; transition:right 1.1s ease-in-out, top 1.1s ease-in-out; filter:drop-shadow(0 2px 2px var(--shadow)); }
+.walker svg{ width:100%; height:100%; display:block; animation:bob 1.2s ease-in-out infinite; }
+.walker.walking svg{ animation:hopwalk .28s ease-in-out infinite; }
+.hint-swipe{ text-align:center; color:var(--soft); font-size:.875rem; margin:-8px 0 12px; }
+
+.sel-card h3{ margin:0 0 2px; font-size:1.15rem; }
+.sel-card .row{ display:flex; gap:12px; align-items:center; }
+.sel-card .mon{ width:84px; height:84px; flex:none; }
+.sel-card .mon svg{ width:100%; height:100%; animation:float 2.4s ease-in-out infinite; }
+.sel-card p{ margin:2px 0; font-size:.95rem; }
+.sel-card .btn{ margin-top:10px; }
+.sel-card .btn.main{ animation:beckon 1.8s ease-in-out infinite; }
+
+/* ---- 戦い ---- */
+.bar-top{ display:flex; align-items:center; gap:8px; margin:0 0 8px; }
+.bar-top .ttl{ flex:1; font-weight:700; font-size:.95rem; min-width:0; line-height:1.4; }
+.bar-top .btn{ min-height:44px; padding:6px 12px; font-size:.9rem; flex:none; }
+.scene{ position:sticky; top:0; z-index:20; height:214px; border-radius:14px 14px 0 0; border:1px solid var(--line); border-bottom:0; overflow:hidden; background:var(--paper2);
+  background:linear-gradient(color-mix(in srgb, var(--mk) 30%, var(--paper)), var(--paper) 78%); }
+@media (max-height:700px){ .scene{ height:184px; } .scene.boss .fig.en{ width:112px; height:112px; } }
+.sc-strip{ position:absolute; left:0; top:0; height:100%; width:1520px; animation:scrollbg 38s linear infinite; }
+.sc-strip svg{ width:100%; height:100%; display:block; }
+.kumo{ position:absolute; height:11px; border-radius:6px; background:#c9a233; opacity:.34; animation:kumo linear infinite; }
+.sc-ground{ position:absolute; left:0; right:0; bottom:0; height:34px; background:var(--paper2); background:color-mix(in srgb, var(--mk) 26%, var(--paper2)); border-top:2px solid color-mix(in srgb, var(--mk) 60%, var(--ink)); }
+.sc-ground:before{ content:""; position:absolute; left:0; top:8px; width:200%; height:3px; background:repeating-linear-gradient(90deg, var(--line) 0 18px, transparent 18px 44px); animation:ground 1.6s linear infinite; opacity:.8; }
+.hud{ position:absolute; top:8px; max-width:47%; padding:4px 8px; border-radius:10px; background:color-mix(in srgb, var(--paper) 82%, transparent); z-index:4; }
+.hud.me{ left:8px; } .hud.en{ right:8px; text-align:right; min-width:42%; }
+.hud .nm{ font-size:.875rem; font-weight:700; line-height:1.3; }
+.hearts{ font-size:1.1rem; letter-spacing:.08em; color:var(--shu); line-height:1.3; }
+.hearts span{ display:inline-block; }
+.hearts .off{ color:var(--line); }
+.hearts .pop{ animation:heartbreak .6s; }
+.hp{ position:relative; height:12px; border-radius:6px; background:var(--paper2); border:1px solid var(--line); overflow:hidden; margin:3px 0 0; }
+.hp i{ position:absolute; left:0; top:0; bottom:0; }
+#hpGhost{ background:var(--kin); transition:width .5s .45s; }
+#hpBar{ background:var(--shu); transition:width .25s; }
+.hpnum{ font-size:.875rem; color:var(--soft); line-height:1.3; }
+.fig{ position:absolute; bottom:22px; width:96px; height:96px; z-index:2; }
+.fig.me{ left:9%; } .fig.en{ right:9%; width:104px; height:104px; bottom:24px; }
+.scene.boss .fig.en{ width:132px; height:132px; right:5%; }
+.fig svg{ width:100%; height:100%; display:block; }
+.fig:after{ content:""; position:absolute; left:18%; right:18%; bottom:-7px; height:10px; border-radius:50%; background:rgba(0,0,0,.22); animation:shadow 2.2s ease-in-out infinite; z-index:-1; }
+.fig.me .idle{ animation:bob 1.1s ease-in-out infinite; }
+.fig.en .idle{ animation:float 2.2s ease-in-out infinite; }
+.scene.boss .fig.en .idle{ animation:bossfloat 2.6s ease-in-out infinite; }
+.fig.me.aura .idle svg{ filter:drop-shadow(0 0 6px #e0b43c) drop-shadow(0 0 12px #e0b43c); }
+.fig.dash{ animation:dash .5s cubic-bezier(.3,.7,.3,1); }
+.fig.struck{ animation:struck .5s; }
+.fig.struck .idle svg{ animation:whiteout .35s; }
+.fig.lunge{ animation:lunge .55s cubic-bezier(.3,.7,.3,1); }
+.fig.hurt{ animation:hurt .55s; }
+.fig.enter{ animation:enter .7s cubic-bezier(.2,1.3,.4,1); }
+.fig.enterme{ animation:enterme .5s ease-out; }
+.fig.gone{ animation:dissolve .9s forwards; }
+.fig.down{ animation:down .8s forwards; }
+.combo{ position:absolute; left:0; right:0; bottom:5px; text-align:center; font-size:.875rem; font-weight:700; color:var(--ink); z-index:4; }
+.combo b{ display:inline-block; padding:0 10px; border-radius:999px; background:#e0b43c; color:#2b2418; animation:pulse .7s ease-in-out infinite; }
+.fx{ position:absolute; inset:0; pointer-events:none; z-index:5; }
+.fx .p{ position:absolute; border-radius:50%; animation:burst .7s ease-out forwards; }
+.fx .slash{ position:absolute; height:7px; width:150px; margin:-3px 0 0 -75px; border-radius:4px; background:var(--ink); transform-origin:50% 50%; animation:slash .32s ease-out forwards; }
+.fx .slash.kin{ background:#e0b43c; height:10px; box-shadow:0 0 10px #e0b43c; }
+.fx .num{ position:absolute; font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:800; font-size:1.7rem; color:var(--shu); text-shadow:0 0 3px var(--paper), 0 0 3px var(--paper), 0 2px 0 var(--paper); animation:rise .9s ease-out forwards; white-space:nowrap; transform:translateX(-50%); }
+.fx .num.kin{ color:#b8860b; font-size:2.1rem; }
+.fx .glyph{ position:absolute; font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:800; font-size:2.6rem; color:#e0b43c; text-shadow:0 0 12px #e0b43c, 0 0 2px #2b2418; animation:ascend 1.5s ease-in forwards; transform:translateX(-50%); }
+.fx .banner{ position:absolute; left:0; right:0; top:42%; text-align:center; font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:800; font-size:1.5rem; color:var(--on-gunjo);
+  background:var(--gunjo-deep); padding:6px 0; animation:banner 1.3s ease-out forwards; letter-spacing:.2em; }
+.scene.flash-w:after, .scene.flash-r:after, .scene.flash-k:after{ content:""; position:absolute; inset:0; z-index:6; pointer-events:none; }
+.scene.flash-w:after{ background:#fff; animation:flash .35s forwards; }
+.scene.flash-k:after{ background:#f3d67a; animation:flash .5s forwards; }
+.scene.flash-r:after{ background:radial-gradient(transparent 30%, #c0392b); animation:flash .6s forwards; }
+.scene.quake{ animation:quake .45s; }
+.msg{ min-height:48px; display:flex; align-items:center; padding:8px 14px; margin:0 0 12px; border-radius:0 0 14px 14px; background:#1b2238; color:#f4ecd8;
+  font-size:.95rem; line-height:1.5; border:1px solid var(--line); border-top:3px solid var(--kin); }
+.msg:after{ content:"▼"; margin-left:6px; font-size:.875rem; color:#e0b43c; animation:blink 1s steps(2) infinite; }
+
+.qcard .qno{ font-size:.875rem; color:var(--soft); font-weight:700; }
+.qcard .qtext{ margin:4px 0 12px; font-size:1.05rem; line-height:1.85; font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif; font-weight:600; }
+.qcard.fresh .qtext{ animation:slidein .3s ease-out; }
+.choices{ display:grid; gap:8px; }
+.choices button{ min-height:52px; text-align:left; padding:10px 14px; border-radius:12px; border:1.5px solid var(--line); background:var(--paper); font-size:1rem; line-height:1.6; transition:transform .08s; }
+.qcard.fresh .choices button{ animation:slidein .3s ease-out backwards; }
+.qcard.fresh .choices button:nth-child(2){ animation-delay:.05s; } .qcard.fresh .choices button:nth-child(3){ animation-delay:.1s; } .qcard.fresh .choices button:nth-child(4){ animation-delay:.15s; }
+.choices button:disabled{ cursor:default; color:var(--ink); }
+.choices button.right{ border-color:var(--rokusho); background:var(--ok-bg); font-weight:700; animation:pop .35s; }
+.choices button.wrong{ border-color:var(--shu); background:var(--ng-bg); animation:nudge .35s; }
+.fb{ margin-top:12px; padding:12px 14px; border-radius:12px; border-left:6px solid var(--rokusho); background:var(--ok-bg); animation:slidein .3s ease-out; }
+.fb.ng{ border-left-color:var(--shu); background:var(--ng-bg); }
+.fb .head{ font-weight:700; font-size:1.05rem; }
+.fb p{ margin:6px 0 0; }
+.fb .yaku{ font-size:.95rem; color:var(--soft); }
+#nextBtn{ margin-top:12px; }
+
+/* ---- 結果 ---- */
+.result{ text-align:center; position:relative; overflow:hidden; }
+.result h2{ margin:4px 0; font-size:1.5rem; color:var(--gunjo-deep); animation:pop .5s; }
+.result .stars{ font-size:2.3rem; letter-spacing:.15em; line-height:1.4; }
+.result .stars span{ display:inline-block; color:var(--line); }
+.result .stars .on{ color:var(--kin); animation:starpop .5s cubic-bezier(.2,1.6,.4,1) backwards; text-shadow:0 0 10px #e0b43c; }
+.result .fig2{ width:120px; height:120px; margin:0 auto; }
+.result .fig2 svg{ width:100%; height:100%; }
+.result.win .fig2 svg{ animation:bob 1.6s ease-in-out infinite; }
+.result.lose .fig2 svg{ animation:float 2s ease-in-out infinite; }
+.result p{ margin:6px 0; }
+.result .stampbig{ display:inline-flex; width:76px; height:76px; align-items:center; justify-content:center; border:3px solid var(--shu); color:var(--shu); border-radius:10px;
+  font-size:2.1rem; font-weight:700; transform:rotate(-6deg); margin:6px 0; font-family:"Hiragino Mincho ProN","Yu Mincho",serif; animation:stamp .5s 1.5s cubic-bezier(.3,1.5,.5,1) backwards; }
+.result .btns{ display:grid; gap:8px; margin-top:12px; position:relative; z-index:2; }
+.flake{ position:absolute; top:-12px; width:8px; height:8px; background:#e0b43c; opacity:.9; animation:fall linear forwards; pointer-events:none; }
+.review h3{ margin:0 0 6px; font-size:1.05rem; }
+.review .item{ border-top:1px dashed var(--line); padding:10px 0; }
+.review .item:first-of-type{ border-top:0; }
+.review .q{ font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:600; }
+.review .a{ color:var(--rokusho); font-weight:700; margin-top:4px; }
+.review .e{ font-size:.95rem; margin-top:2px; }
+footer{ text-align:center; color:var(--soft); font-size:.875rem; margin-top:24px; }
+
+/* ---- 動き ---- */
+@keyframes pulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.08);} }
+@keyframes beckon{ 0%,100%{ box-shadow:0 0 0 0 rgba(224,180,60,.0);} 50%{ box-shadow:0 0 0 6px rgba(224,180,60,.45);} }
+@keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-5px);} }
+@keyframes float{ 0%,100%{ transform:translateY(0) rotate(-2deg);} 50%{ transform:translateY(-8px) rotate(2deg);} }
+@keyframes bossfloat{ 0%,100%{ transform:translateY(0) scale(1);} 50%{ transform:translateY(-7px) scale(1.05);} }
+@keyframes shadow{ 0%,100%{ transform:scaleX(1); opacity:.9;} 50%{ transform:scaleX(.8); opacity:.55;} }
+@keyframes hopwalk{ 0%,100%{ transform:translateY(0) rotate(-6deg);} 50%{ transform:translateY(-9px) rotate(6deg);} }
+@keyframes drift{ from{ transform:translateX(-18px);} to{ transform:translateX(18px);} }
+@keyframes sway{ from{ transform:rotate(-2.5deg);} to{ transform:rotate(2.5deg);} }
+@keyframes unlock{ 0%{ transform:scale(.3); box-shadow:0 0 0 0 #e0b43c;} 60%{ transform:scale(1.25); box-shadow:0 0 0 14px rgba(224,180,60,0);} 100%{ transform:scale(1);} }
+@keyframes scrollbg{ from{ transform:translateX(-760px);} to{ transform:translateX(0);} }
+@keyframes kumo{ from{ transform:translateX(-160px);} to{ transform:translateX(760px);} }
+@keyframes ground{ from{ transform:translateX(-44px);} to{ transform:translateX(0);} }
+@keyframes dash{ 0%,100%{ transform:none;} 30%{ transform:translateX(-14px) scale(.96);} 55%{ transform:translate(var(--dash,80px),-10px) scale(1.12) rotate(8deg);} }
+@keyframes struck{ 0%,100%{ transform:none;} 30%{ transform:translateX(0);} 50%{ transform:translateX(16px) rotate(8deg);} 65%{ transform:translateX(-8px);} 80%{ transform:translateX(6px);} }
+@keyframes whiteout{ 0%,100%{ filter:none;} 40%{ filter:brightness(3) saturate(0);} }
+@keyframes lunge{ 0%,100%{ transform:none;} 30%{ transform:translateX(14px) scale(.96);} 55%{ transform:translate(calc(var(--dash,80px) * -1),4px) scale(1.15);} }
+@keyframes hurt{ 0%,100%{ transform:none;} 45%{ transform:none;} 55%{ transform:translateX(-14px) rotate(-10deg);} 70%{ transform:translateX(8px);} 85%{ transform:translateX(-5px);} }
+@keyframes enter{ from{ transform:translateX(180px) scale(.4); opacity:0;} to{ transform:none; opacity:1;} }
+@keyframes enterme{ from{ transform:translateX(-120px); opacity:0;} to{ transform:none; opacity:1;} }
+@keyframes dissolve{ 0%{ transform:none; opacity:1; filter:none;} 30%{ transform:scale(1.15) rotate(-6deg); filter:brightness(2);} 100%{ transform:scale(.2) translateY(30px) rotate(40deg); opacity:0; filter:blur(4px);} }
+@keyframes down{ to{ transform:translateY(14px) rotate(-80deg); opacity:.45; filter:grayscale(1);} }
+@keyframes burst{ from{ transform:translate(0,0) scale(1); opacity:1;} to{ transform:translate(var(--dx),var(--dy)) scale(.2); opacity:0;} }
+@keyframes slash{ 0%{ clip-path:inset(0 100% 0 0); opacity:1;} 60%{ clip-path:inset(0 0 0 0); opacity:1;} 100%{ clip-path:inset(0 0 0 100%); opacity:0;} }
+@keyframes rise{ 0%{ margin-top:0; opacity:0; scale:.4;} 20%{ opacity:1; scale:1.3;} 40%{ scale:1;} 100%{ margin-top:-56px; opacity:0;} }
+@keyframes ascend{ 0%{ margin-top:0; opacity:0; scale:.5;} 25%{ opacity:1; scale:1.4;} 100%{ margin-top:-150px; opacity:0; scale:.8;} }
+@keyframes banner{ 0%{ transform:scaleY(0); opacity:0;} 15%{ transform:scaleY(1); opacity:1;} 75%{ transform:scaleY(1); opacity:1;} 100%{ transform:scaleY(0); opacity:0;} }
+@keyframes flash{ from{ opacity:.85;} to{ opacity:0;} }
+@keyframes quake{ 0%,100%{ transform:none;} 15%{ transform:translate(-7px,3px);} 30%{ transform:translate(7px,-4px);} 45%{ transform:translate(-6px,-2px);} 60%{ transform:translate(5px,3px);} 80%{ transform:translate(-3px,1px);} }
+@keyframes heartbreak{ 0%{ transform:scale(1); color:var(--shu);} 40%{ transform:scale(1.9) rotate(-15deg); color:var(--shu);} 100%{ transform:scale(1); } }
+@keyframes blink{ 50%{ opacity:0;} }
+@keyframes slidein{ from{ transform:translateY(10px); opacity:0;} to{ transform:none; opacity:1;} }
+@keyframes pop{ 0%{ transform:scale(.9);} 50%{ transform:scale(1.04);} 100%{ transform:scale(1);} }
+@keyframes nudge{ 0%,100%{ transform:none;} 25%{ transform:translateX(-6px);} 75%{ transform:translateX(6px);} }
+@keyframes starpop{ from{ transform:scale(0) rotate(-180deg); opacity:0;} to{ transform:none; opacity:1;} }
+@keyframes stamp{ from{ transform:scale(3.2) rotate(18deg); opacity:0;} to{ transform:rotate(-6deg); opacity:1;} }
+@keyframes fall{ to{ transform:translateY(520px) rotate(540deg); opacity:.2;} }
+
+/* ---- もっと派手に（2026-11-18） ---- */
+.fx .slash{ height:16px; width:236px; margin:-8px 0 0 -118px; border-radius:50%; }
+.fx .slash.kin{ height:24px; }
+.fx .ring{ position:absolute; width:60px; height:60px; margin:-30px 0 0 -30px; border-radius:50%; border:5px solid #e0b43c; animation:ring .55s ease-out forwards; }
+.fx .ring.ink{ border-color:#2b2418; }
+.fx .lines{ position:absolute; inset:0; background:repeating-conic-gradient(from 0deg at var(--cx) var(--cy), transparent 0 5deg, rgba(43,36,24,.6) 5deg 6.4deg);
+  -webkit-mask:radial-gradient(circle at var(--cx) var(--cy), transparent 20%, #000 60%); mask:radial-gradient(circle at var(--cx) var(--cy), transparent 20%, #000 60%); animation:lines .65s ease-out forwards; }
+.fx .kanji{ position:absolute; font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:800; font-size:3.4rem; line-height:1; color:#fff; -webkit-text-stroke:2px #2b2418; paint-order:stroke fill;
+  text-shadow:0 0 14px #c0392b; transform:translate(-50%,-50%) rotate(-10deg); animation:kanji .78s ease-out forwards; white-space:nowrap; }
+.fx .kanji.kin{ font-size:4.2rem; color:#ffe082; text-shadow:0 0 18px #e0b43c, 0 0 4px #fff; }
+.fx .cutin{ position:absolute; left:0; right:0; top:50%; height:88px; margin-top:-44px; background:linear-gradient(90deg,#0f2a52,#1f4a8a 60%,#0f2a52); border-top:3px solid #e0b43c; border-bottom:3px solid #e0b43c;
+  overflow:hidden; animation:cutin .82s ease-out forwards; display:flex; align-items:center; }
+.cutin .face{ width:96px; height:96px; flex:none; margin-left:8px; animation:cutface .82s ease-out; }
+.cutin .face svg{ width:100%; height:100%; display:block; }
+.cutin .txt{ flex:1; text-align:center; font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:800; font-size:1.75rem; color:#ffe082; letter-spacing:.1em; text-shadow:0 0 10px #e0b43c; animation:cuttxt .82s ease-out; white-space:nowrap; }
+.fx .blob{ position:absolute; width:28px; height:28px; margin:-14px; border-radius:50%; border:3px solid #14110c; animation:blob .26s ease-in forwards; }
+.fx .splat{ position:absolute; border-radius:47% 53% 60% 40%/55% 45% 52% 48%; background:#14110c; opacity:.9; animation:splat 1.5s ease-in forwards; }
+.fx .pillar{ position:absolute; bottom:0; width:90px; margin-left:-45px; height:100%; background:linear-gradient(90deg,transparent,rgba(255,224,130,.95),#fff,rgba(255,224,130,.95),transparent); transform-origin:bottom; animation:pillar 1.2s ease-out forwards; }
+.scene.fever{ box-shadow:inset 0 0 0 3px #e0b43c, inset 0 0 30px rgba(224,180,60,.8); }
+.scene.fever .sc-strip{ animation-duration:8s; }
+.scene.fever .sc-ground:before{ animation-duration:.4s; }
+.scene.fever .kumo{ opacity:.7; }
+.scene.fever .combo b{ font-size:1.05rem; padding:2px 16px; box-shadow:0 0 14px #e0b43c; }
+.scene.danger{ box-shadow:inset 0 0 0 3px #c0392b, inset 0 0 34px rgba(192,57,43,.65); }
+.scene.danger .hearts span:not(.off){ animation:pulse .5s ease-in-out infinite; }
+.fig.en.weak .idle, .scene.boss .fig.en.weak .idle{ animation:tremble .16s linear infinite; }
+.fig.en.weak svg{ filter:saturate(.55) brightness(1.15); }
+.wrap.pageshake{ animation:quake .45s; }
+#wipe{ position:fixed; inset:0; z-index:200; background:#14110c; display:flex; align-items:center; justify-content:center; pointer-events:none; animation:wipe .9s ease-in-out forwards; }
+#wipe span{ font-family:"Hiragino Mincho ProN","Yu Mincho",serif; font-weight:800; font-size:2.3rem; color:#ffe082; letter-spacing:.3em; text-shadow:0 0 14px #e0b43c; animation:wipetxt .9s; }
+.result .rays{ position:absolute; left:50%; top:76px; width:340px; height:340px; margin:-170px 0 0 -170px; border-radius:50%; background:repeating-conic-gradient(rgba(224,180,60,.42) 0 10deg, transparent 10deg 20deg);
+  -webkit-mask:radial-gradient(circle,#000 18%,transparent 68%); mask:radial-gradient(circle,#000 18%,transparent 68%); animation:spin 12s linear infinite; pointer-events:none; }
+.result .fig2, .result h2, .result .stars, .result p, .result .stampbig{ position:relative; z-index:1; }
+.result.win .fig2 svg{ animation:victory .7s ease-in-out infinite; }
+.result .fw{ position:absolute; width:7px; height:7px; border-radius:50%; animation:burst 1s ease-out forwards; pointer-events:none; z-index:1; box-shadow:0 0 6px currentColor; }
+@keyframes ring{ from{ scale:.2; opacity:1;} to{ scale:3.4; opacity:0;} }
+@keyframes lines{ 0%{ opacity:0; scale:1.4;} 20%{ opacity:1;} 100%{ opacity:0; scale:1;} }
+@keyframes kanji{ 0%{ scale:3.2; opacity:0;} 16%{ scale:.9; opacity:1;} 28%{ scale:1.12;} 70%{ scale:1; opacity:1;} 100%{ scale:1.35; opacity:0;} }
+@keyframes cutin{ 0%{ clip-path:inset(50% 0);} 14%{ clip-path:inset(0);} 82%{ clip-path:inset(0); opacity:1;} 100%{ clip-path:inset(50% 0); opacity:0;} }
+@keyframes cutface{ 0%{ transform:translateX(-150px);} 22%{ transform:translateX(0) scale(1.1);} 100%{ transform:translateX(16px) scale(1.1);} }
+@keyframes cuttxt{ 0%{ transform:translateX(240px);} 22%{ transform:translateX(0);} 100%{ transform:translateX(-16px);} }
+@keyframes blob{ to{ transform:translate(var(--dx),var(--dy)) scale(1.5);} }
+@keyframes splat{ 0%{ scale:0;} 7%{ scale:1.2;} 13%{ scale:1;} 55%{ opacity:.88; transform:translateY(8px) scaleY(1.2);} 100%{ opacity:0; transform:translateY(30px) scaleY(1.6);} }
+@keyframes pillar{ 0%{ transform:scaleY(0) scaleX(.3); opacity:1;} 22%{ transform:scaleY(1) scaleX(1);} 70%{ opacity:1;} 100%{ transform:scaleY(1) scaleX(.08); opacity:0;} }
+@keyframes tremble{ 0%,100%{ transform:translate(0,0);} 25%{ transform:translate(-3px,1px);} 75%{ transform:translate(3px,-1px);} }
+@keyframes wipe{ 0%{ clip-path:polygon(100% 0,100% 0,100% 100%,100% 100%);} 38%,62%{ clip-path:polygon(0 0,100% 0,100% 100%,0 100%);} 100%{ clip-path:polygon(0 0,0 0,0 100%,0 100%);} }
+@keyframes wipetxt{ 0%,22%{ opacity:0; scale:1.7;} 42%,66%{ opacity:1; scale:1;} 100%{ opacity:0;} }
+@keyframes spin{ to{ rotate:360deg;} }
+@keyframes victory{ 0%,100%{ transform:translateY(0) rotate(-5deg);} 50%{ transform:translateY(-14px) rotate(5deg);} }
+@keyframes quake{ 0%,100%{ transform:none;} 12%{ transform:translate(-10px,4px) rotate(-.7deg);} 26%{ transform:translate(10px,-5px) rotate(.7deg);} 40%{ transform:translate(-8px,-3px);} 55%{ transform:translate(7px,4px);} 72%{ transform:translate(-4px,2px);} 86%{ transform:translate(3px,-1px);} }
+@media (prefers-reduced-motion:reduce){ *,*:before,*:after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition:none !important; } .sc-strip,.kumo,.flake{ animation:none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1><span>古文絵巻道場</span></h1>
+    <p>文法の力で物の怪をしずめ、絵巻の中を旅する</p>
+  </header>
+
+  <!-- ================= 地図 ================= -->
+  <main id="viewMap">
+    <nav class="sister" aria-label="道場の切り替え">
+      <a href="https://upopotennis-gif.github.io/kokugo-dojo/">国語道場トップ</a>
+      <a href="https://upopotennis-gif.github.io/kobun-dojo/">古文文法道場</a>
+      <a href="./" aria-current="page">絵巻道場</a>
+      <button type="button" class="sndBtn"></button>
+    </nav>
+    <section class="card" aria-label="旅の記録">
+      <div class="kiroku">
+        <button type="button" class="aibo" id="aiboBtn" aria-label="相棒の付喪神を見る"></button>
+        <div class="txt">
+          <div class="name" id="aiboName"></div>
+          <div class="sub" id="kirokuSub"></div>
+        </div>
+      </div>
+      <div class="tegata" id="tegata" aria-label="集めた手形"></div>
+      <details class="story" id="story">
+        <summary>物語と進み方</summary>
+        <p id="prologue"></p>
+        <p>・関（せき）ごとに物の怪が1体。正解すると相手の力が減り、0にすれば関を越えられる。<br>
+           ・まちがえると自分の体力（♥）が減る。0になったら、その関をやり直す。<br>
+           ・<span id="ruleCombo"></span>問つづけて正解すると「会心の一撃」で2つ減らせる。<br>
+           ・ノーミスで★3、1ミスで★2、それ以外は★1。巻の最後には、その巻の全部から問いを出す「ぬし」がいる。<br>
+           ・音は「音：入／切」のボタンで切りかえられる。<br>
+           ・★や手形の記録はこの端末のブラウザの中だけに残る。先生には、道場が使われた回数と出題数・正解数の合計だけが届く（名前は送らない）。</p>
+      </details>
+    </section>
+
+    <div class="chips" id="chips" role="group" aria-label="巻をえらぶ"></div>
+    <section class="card maki-head" id="makiHead"></section>
+    <div class="scroll-frame"><div class="emaki" id="emaki" tabindex="0" aria-label="絵巻の地図（右から左へ進む）"><div class="emaki-inner" id="emakiInner"></div></div></div>
+    <p class="hint-swipe">絵巻は右から左へ。横になぞると先が見える</p>
+    <section class="card sel-card" id="selCard" aria-live="polite"></section>
+  </main>
+
+  <!-- ================= 戦い ================= -->
+  <main id="viewBattle" hidden>
+    <div class="bar-top">
+      <div class="ttl" id="bTitle"></div>
+      <button type="button" class="btn sndBtn"></button>
+      <button type="button" class="btn" id="quitBtn">地図へ</button>
+    </div>
+    <section class="scene" id="scene" aria-label="戦いのようす">
+      <div id="scBg" aria-hidden="true"></div>
+      <div class="sc-ground" aria-hidden="true"></div>
+      <div class="hud me"><div class="nm" id="meName"></div><div class="hearts" id="hearts" role="img"></div></div>
+      <div class="hud en"><div class="nm" id="enName"></div><div class="hp" aria-hidden="true"><i id="hpGhost"></i><i id="hpBar"></i></div><div class="hpnum" id="hpNum"></div></div>
+      <div class="fig me" id="meFig"><div class="idle" id="meArt"></div></div>
+      <div class="fig en" id="enFig"><div class="idle" id="enArt"></div></div>
+      <div class="combo" id="combo"></div>
+      <div class="fx" id="fx" aria-hidden="true"></div>
+    </section>
+    <div class="msg" id="msg" aria-hidden="true"></div>
+    <section class="card qcard" id="qCard">
+      <div class="qno" id="qNo"></div>
+      <div class="qtext" id="qText"></div>
+      <div class="choices" id="choices"></div>
+      <div id="fb" aria-live="polite"></div>
+      <button type="button" class="btn main wide" id="nextBtn" hidden>次へ</button>
+    </section>
+  </main>
+
+  <!-- ================= 結果 ================= -->
+  <main id="viewResult" hidden>
+    <section class="card result" id="resultCard"></section>
+    <section class="card review" id="reviewCard" hidden></section>
+  </main>
+
+  <footer>問題は古文文法道場と同じものを使っています。★や手形の記録はこの端末の中だけに保存されます（先生に届くのは利用の回数と正解数の合計だけで、名前は送りません）。</footer>
+</div>
+
+<script src="mondai.js?v=7d1df442"></script>
+<script>
+(function(){
+"use strict";
+var CFG = {"rules":{"stageHp":8,"bossHp":12,"finalHp":15,"stageLife":3,"bossLife":4,"comboFrom":3,"sound":true},"prologue":"ある夜、書庫の古い絵巻から文字がするすると抜け出して、物の怪になってしまった。文字をなくした絵巻は、だれにも読めない。相棒の付喪神といっしょに絵巻の中を旅して、文法の力でことばを取りもどそう。","ending":"最後のぬしが墨にもどり、絵巻にすべての文字が帰ってきた。これでもう、どの物語も自分の力で読める。——旅はここまで。でも、★を三つにそろえる道は、まだ残っている。","maki":[{"id":"taketori","title":"巻一 竹取の巻","short":"竹取","theme":"古典文法入門","motif":"take","color":"#3f8a4f","intro":"光る竹の林。ここでは仮名も文節もばらばらになって、竹のあいだをただよっている。まずは古文を読むための足場を取りもどそう。","clear":"竹の中から、文字がひとすじの光になって帰ってきた。手形「竹」を受け取った。","stamp":"竹","stages":[{"unit":"kana","label":"仮名遣い","enemy":"仮名たがへ","glyph":"ゐ","kind":0},{"unit":"tango-tan-i","label":"文・文節","enemy":"文節きり","glyph":"節","kind":2},{"unit":"hinshi","label":"品詞","enemy":"品詞まどひ","glyph":"詞","kind":1},{"unit":"katsuyo-kiso","label":"活用の基礎","enemy":"六つ形","glyph":"形","kind":3}],"boss":{"name":"竹やぶのぬし","glyph":"竹","kind":1}},{"id":"ise","title":"巻二 伊勢の巻","short":"伊勢","theme":"用言","motif":"hashi","color":"#7a5ea8","intro":"都をはなれて東へ下る道。橋のたもとで、動詞や形容詞が姿を変えながら行く手をふさぐ。活用を見ぬいて橋をわたろう。","clear":"八つの橋をわたりきった。かきつばたの紫とともに、手形「橋」を受け取った。","stamp":"橋","stages":[{"unit":"doushi-yodan-nidan","label":"四段・二段","enemy":"段まよひ","glyph":"段","kind":1},{"unit":"doushi-ichidan","label":"一段","enemy":"一段こぞう","glyph":"一","kind":0},{"unit":"doushi-henkaku","label":"変格","enemy":"変格あばれ","glyph":"変","kind":3},{"unit":"doushi-sougou","label":"動詞総合","enemy":"九つ化け","glyph":"九","kind":2},{"unit":"doushi-onbin","label":"音便","enemy":"音便ぬめり","glyph":"便","kind":1},{"unit":"keiyoushi","label":"形容詞","enemy":"くしき火","glyph":"し","kind":0},{"unit":"keiyoudoushi","label":"形容動詞","enemy":"なりたり坊","glyph":"なり","kind":2}],"boss":{"name":"八橋のぬし","glyph":"橋","kind":3}},{"id":"tosa","title":"巻三 土佐の巻","short":"土佐","theme":"助動詞","motif":"nami","color":"#2f6f9f","intro":"都へ帰る船の旅。波の上では、助動詞が風のように向きを変える。意味と接続を見きわめて、舟を進めよう。","clear":"波がしずまり、舟は港に着いた。手形「舟」を受け取った。","stamp":"舟","stages":[{"unit":"jodoushi-kiso","label":"助動詞入門","enemy":"接続むすび","glyph":"接","kind":2},{"unit":"jodoushi-jihatsu","label":"る・らる","enemy":"るらる入道","glyph":"る","kind":3},{"unit":"jodoushi-shieki","label":"す・さす","enemy":"さしむ童","glyph":"す","kind":0},{"unit":"jodoushi-kako","label":"過去・完了","enemy":"きけり翁","glyph":"けり","kind":1},{"unit":"jodoushi-suiryo","label":"推量","enemy":"むむず雲","glyph":"む","kind":3},{"unit":"jodoushi-uchikeshi","label":"打消","enemy":"ずじまじ","glyph":"ず","kind":1},{"unit":"jodoushi-ganbou","label":"願望・比況","enemy":"まほし火","glyph":"たし","kind":0}],"boss":{"name":"荒波のぬし","glyph":"波","kind":3}},{"id":"makura","title":"巻四 枕の巻","short":"枕","theme":"助詞","motif":"hana","color":"#c2607a","intro":"春はあけぼの。宮中の四季のなかで、小さな助詞たちがいたずらをして、文のつながりをほどいてしまった。一つずつ結び直そう。","clear":"あけぼのの空に、ことばの糸が結び直された。手形「曙」を受け取った。","stamp":"曙","stages":[{"unit":"joshi-kiso","label":"助詞入門","enemy":"六わけ","glyph":"助","kind":2},{"unit":"joshi-kaku","label":"格助詞","enemy":"がの丸","glyph":"の","kind":1},{"unit":"joshi-setsuzoku","label":"接続助詞","enemy":"ばど坊","glyph":"ば","kind":0},{"unit":"joshi-kakari","label":"係り結び","enemy":"こそ結び","glyph":"こそ","kind":3},{"unit":"joshi-fuku","label":"副助詞","enemy":"だにさへ","glyph":"だに","kind":1},{"unit":"joshi-shuu","label":"終助詞","enemy":"ばやかな","glyph":"ばや","kind":0}],"boss":{"name":"あけぼののぬし","glyph":"曙","kind":0}},{"id":"genji","title":"巻五 源氏の巻","short":"源氏","theme":"敬語","motif":"misu","color":"#8a4a8f","intro":"御簾のむこうの宮廷。ここでは、だれがだれを敬っているのかが分からなければ一歩も進めない。敬語の向きを読み取ろう。","clear":"御簾が上がり、人と人のあいだの敬意が見えるようになった。手形「簾」を受け取った。","stamp":"簾","stages":[{"unit":"keigo-kiso","label":"敬語入門","enemy":"敬ひ迷ひ","glyph":"敬","kind":3},{"unit":"keigo-sonkei","label":"尊敬語","enemy":"たまふ影","glyph":"給","kind":2},{"unit":"keigo-kenjou","label":"謙譲語","enemy":"まゐり影","glyph":"参","kind":2},{"unit":"keigo-teinei","label":"丁寧語","enemy":"はべり影","glyph":"侍","kind":2},{"unit":"keigo-magirawashii","label":"二重敬語","enemy":"二重がさね","glyph":"重","kind":1},{"unit":"keigo-shikibetsu","label":"敬意の向き","enemy":"たれかれ","glyph":"誰","kind":3},{"unit":"keigo-yaku","label":"敬語の訳","enemy":"訳しちがへ","glyph":"訳","kind":0}],"boss":{"name":"御簾のぬし","glyph":"簾","kind":2}},{"id":"hojo","title":"巻六 方丈の巻","short":"方丈","theme":"活用のない自立語","motif":"io","color":"#6b7a4a","intro":"川のほとりの小さな庵。形を変えない名詞や副詞が、しずかに道をふさいでいる。短い巻だが、油断は禁物。","clear":"ゆく河の流れが、ことばを庵まで運んできた。手形「庵」を受け取った。","stamp":"庵","stages":[{"unit":"meishi","label":"名詞","enemy":"名なし","glyph":"名","kind":1},{"unit":"fukushi","label":"副詞ほか","enemy":"えず坊","glyph":"副","kind":0}],"boss":{"name":"ゆく河のぬし","glyph":"河","kind":3}},{"id":"kokin","title":"巻七 古今の巻","short":"古今","theme":"和歌の修辞法","motif":"tanzaku","color":"#b5762a","intro":"歌合の庭。三十一文字のなかに、枕詞や掛詞がかくれている。歌にこめられたしかけを見つけ出そう。","clear":"言の葉が一枚ずつ短冊にもどった。手形「歌」を受け取った。","stamp":"歌","stages":[{"unit":"waka-1","label":"枕詞・序詞","enemy":"枕ことば鳥","glyph":"枕","kind":3},{"unit":"waka-2","label":"掛詞ほか","enemy":"掛けことば狐","glyph":"掛","kind":0}],"boss":{"name":"言の葉のぬし","glyph":"歌","kind":2}},{"id":"heike","title":"巻八 平家の巻","short":"平家","theme":"紛らわしい語の識別・総仕上げ","motif":"hono","color":"#b0402e","intro":"最後の巻。「なり」「なむ」「ぬ」——よく似た姿の語が入りみだれる戦場。ここを越えた先に、絵巻のぬしが待っている。ぬしは、これまでのすべての巻から問いを出す。","clear":"手形「巻」を受け取った。八つの手形がそろった。","stamp":"巻","stages":[{"unit":"magirawashii-go","label":"識別","enemy":"なりなむ鵺","glyph":"識","kind":1}],"boss":{"name":"絵巻のぬし","glyph":"巻","kind":1,"final":true}}]};
+var POOLS = window.EMAKI_POOLS || {};
+var R = CFG.rules, KEY = "kobunEmaki.v1";
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(m){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]; }); }
+function rnd(a, b){ return a + Math.random() * (b - a); }
+
+// ---------------------------------------------------------------- 旅程
+var NODES = [];   // 進む順
+CFG.maki.forEach(function(m, mi){
+  var units = [];
+  m.stages.forEach(function(s){
+    units.push(s.unit);
+    NODES.push({ id:s.unit, maki:mi, boss:false, label:s.label, enemy:s.enemy, glyph:s.glyph, kind:s.kind, units:[s.unit], hp:R.stageHp, life:R.stageLife, color:m.color });
+  });
+  NODES.push({ id:"boss-" + m.id, maki:mi, boss:true, fin:!!m.boss.final, label:"ぬし", enemy:m.boss.name, glyph:m.boss.glyph, kind:m.boss.kind,
+    units: m.boss.final ? null : units, hp: m.boss.final ? R.finalHp : R.bossHp, life:R.bossLife, color:m.color });
+});
+var ALL_UNITS = NODES.filter(function(n){ return !n.boss; }).map(function(n){ return n.id; });
+NODES.forEach(function(n, i){ n.idx = i; if(!n.units) n.units = ALL_UNITS; });
+var MAX_STARS = NODES.length * 3;
+
+// ---------------------------------------------------------------- 記録
+var S = { v:1, clear:{}, seen:{}, right:0, asked:0, maki:0 };
+try{ var raw = localStorage.getItem(KEY); if(raw){ var o = JSON.parse(raw); if(o && o.v === 1){ for(var k in o) S[k] = o[k]; } } }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function stars(n){ return S.clear[n.id] || 0; }
+function isOpen(n){ return n.idx === 0 || stars(NODES[n.idx - 1]) > 0; }
+function frontier(){ for(var i=0;i<NODES.length;i++){ if(!stars(NODES[i])) return NODES[i]; } return null; }
+function totalStars(){ var t = 0; NODES.forEach(function(n){ t += stars(n); }); return t; }
+function makiCleared(mi){ return NODES.some(function(n){ return n.maki === mi && n.boss && stars(n) > 0; }); }
+function starText(k, max){ var s = ""; for(var i=0;i<(max||3);i++) s += i < k ? "★" : "☆"; return s; }
+
+// ---------------------------------------------------------------- 音（その場で作る。音のファイルは使わない）
+var Snd = (function(){
+  var ctx = null;
+  function on(){ return S.snd === undefined ? R.sound !== false : !!S.snd; }
+  function ac(){
+    if(!on()) return null;
+    try{ if(!ctx){ var A = window.AudioContext || window.webkitAudioContext; if(!A) return null; ctx = new A(); } if(ctx.state === "suspended") ctx.resume(); }catch(e){ ctx = null; }
+    return ctx;
+  }
+  function tone(f, t0, d, type, v, f2){
+    var c = ac(); if(!c) return;
+    var t = c.currentTime + t0, o = c.createOscillator(), g = c.createGain();
+    o.type = type || "triangle"; o.frequency.setValueAtTime(f, t);
+    if(f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v || 0.12, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.03);
+  }
+  function noise(t0, d, v){
+    var c = ac(); if(!c) return;
+    var n = Math.floor(c.sampleRate * d), buf = c.createBuffer(1, n, c.sampleRate), a = buf.getChannelData(0);
+    for(var i=0;i<n;i++) a[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2);
+    var s = c.createBufferSource(), g = c.createGain(); s.buffer = buf; g.gain.value = v || 0.2; s.connect(g); g.connect(c.destination); s.start(c.currentTime + t0);
+  }
+  var YO = [587, 659, 784, 880, 988, 1175, 1319, 1568];   // 陽音階（レミソラシ）
+  var P = {
+    tap:    function(){ tone(700, 0, .05, "square", .03); },
+    appear: function(){ tone(196, 0, .22, "sawtooth", .08, 98); tone(147, .2, .4, "sawtooth", .08, 73); noise(0, .3, .08); },
+    boss:   function(){ tone(110, 0, .5, "sawtooth", .12, 55); tone(104, .45, .7, "sawtooth", .12, 49); noise(0, .9, .1); },
+    hit:    function(){ noise(0, .13, .28); tone(240, 0, .13, "sawtooth", .12, 90); tone(988, .05, .18, "triangle", .08); },
+    crit:   function(){ noise(0, .2, .34); tone(330, 0, .12, "sawtooth", .14, 100); noise(.12, .2, .3); tone(1175, .12, .3, "triangle", .12); tone(1568, .2, .35, "triangle", .1); },
+    miss:   function(){ noise(0, .2, .2); tone(170, 0, .35, "sawtooth", .15, 60); },
+    down:   function(){ [392, 330, 262, 196].forEach(function(f, i){ tone(f, i * .22, .4, "triangle", .12); }); },
+    vanish: function(){ for(var i=0;i<6;i++) tone(YO[i] , i * .07, .3, "triangle", .08); noise(0, .5, .12); },
+    win:    function(){ [0,2,4,5,4,5,7].forEach(function(k, i){ tone(YO[k], i * .11, .35, "triangle", .12); tone(YO[k] / 2, i * .11, .3, "sine", .06); }); },
+    star:   function(){ tone(1319, 0, .25, "triangle", .1); tone(1976, .05, .3, "sine", .06); },
+    stamp:  function(){ noise(0, .16, .4); tone(120, 0, .25, "sine", .3, 55); },
+    step:   function(){ tone(520, 0, .05, "sine", .05, 380); },
+    open:   function(){ tone(784, 0, .15, "triangle", .09); tone(1175, .1, .3, "triangle", .09); }
+  };
+  P.cut  = function(){ noise(0, .3, .14); tone(880, 0, .5, "triangle", .1, 2093); tone(1319, .1, .45, "sine", .07, 2637); };
+  P.wipe = function(){ noise(0, .4, .14); tone(260, 0, .4, "sawtooth", .06, 900); };
+  P.fire = function(){ noise(0, .28, .16); tone(rnd(700, 1500), 0, .3, "triangle", .07, 300); };
+  // 戦いの間の太鼓（ドン・カッ）。間隔 ms、0 で止める
+  var bt = null, bstep = 0;
+  function beat(){
+    if(!on()) return; var s = bstep++ % 8;
+    if(s === 0 || s === 3 || s === 4 || s === 6){ tone(96, 0, .22, "sine", .2, 42); noise(0, .05, .1); }
+    else if(s !== 1){ noise(0, .035, .07); tone(840, 0, .035, "square", .02); }
+  }
+  return { bgm:function(ms){ clearInterval(bt); bt = null; if(ms) bt = setInterval(beat, ms); },
+           play:function(name){ try{ if(P[name]) P[name](); }catch(e){} }, on:on,
+           toggle:function(){ S.snd = !on(); save(); if(S.snd) this.play("open"); } };
+})();
+function buzz(ms){ try{ if(Snd.on() && navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
+function drawSnd(){ [].forEach.call(document.querySelectorAll(".sndBtn"), function(b){ b.textContent = Snd.on() ? "音：入" : "音：切"; b.setAttribute("aria-pressed", Snd.on()); }); }
+[].forEach.call(document.querySelectorAll(".sndBtn"), function(b){ b.onclick = function(){ Snd.toggle(); drawSnd(); }; });
+
+// ---------------------------------------------------------------- 絵
+function monster(n, defeated){
+  var c = n.color, d = [
+    "M50 8 C62 28 84 38 84 62 C84 82 68 94 50 94 C32 94 16 82 16 62 C16 46 28 40 34 26 C40 36 44 30 50 8Z",
+    "M20 52 C14 28 40 16 54 22 C74 14 92 36 84 56 C94 76 74 94 52 90 C30 96 8 80 20 52Z",
+    "M24 16 L76 16 L80 80 L68 90 L58 80 L48 92 L38 80 L26 90 L20 80 Z",
+    "M22 72 C6 72 6 50 22 48 C22 30 46 24 54 38 C66 26 88 36 82 54 C96 58 92 78 78 76 C70 90 34 90 22 72Z"
+  ][n.kind % 4];
+  var ey = [56, 50, 42, 56][n.kind % 4], gy = [84, 80, 74, 82][n.kind % 4];
+  var h = '<svg viewBox="0 0 100 100" role="img" aria-label="' + esc(n.enemy) + '">';
+  if(n.boss) h += '<path d="M30 22 L24 2 L42 16 Z M70 22 L76 2 L58 16 Z" fill="#c9a233" stroke="#2b2418" stroke-width="2" stroke-linejoin="round"/>';
+  h += '<path d="' + d + '" fill="' + c + '" stroke="' + (n.boss ? "#c9a233" : "#2b2418") + '" stroke-width="' + (n.boss ? 4 : 2.5) + '" stroke-linejoin="round"/>';
+  if(defeated){
+    h += '<path d="M32 ' + (ey-2) + ' q6 6 12 0 M56 ' + (ey-2) + ' q6 6 12 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+  }else{
+    h += '<ellipse cx="38" cy="' + ey + '" rx="8" ry="9" fill="#fff"/><ellipse cx="62" cy="' + ey + '" rx="8" ry="9" fill="#fff"/>' +
+         '<circle cx="40" cy="' + (ey+2) + '" r="4" fill="#2b2418"><animate attributeName="r" values="4;4;0.6;4" keyTimes="0;0.9;0.95;1" dur="3.4s" repeatCount="indefinite"/></circle>' +
+         '<circle cx="60" cy="' + (ey+2) + '" r="4" fill="#2b2418"><animate attributeName="r" values="4;4;0.6;4" keyTimes="0;0.9;0.95;1" dur="3.4s" repeatCount="indefinite"/></circle>' +
+         '<path d="M27 ' + (ey-13) + ' L46 ' + (ey-8) + ' M73 ' + (ey-13) + ' L54 ' + (ey-8) + '" stroke="#2b2418" stroke-width="3.5" stroke-linecap="round"/>';
+  }
+  h += '<text x="50" y="' + gy + '" text-anchor="middle" font-size="' + (n.glyph.length > 1 ? 16 : 20) + '" font-weight="800" fill="#fff" font-family="serif">' + esc(n.glyph) + '</text></svg>';
+  return h;
+}
+function travelerSVG(){
+  return '<svg viewBox="0 0 100 100" role="img" aria-label="旅人"><ellipse cx="50" cy="66" rx="26" ry="26" fill="#1f4a8a" stroke="#2b2418" stroke-width="2.5"/>' +
+    '<circle cx="50" cy="44" r="17" fill="#f6dfc0" stroke="#2b2418" stroke-width="2.5"/><path d="M18 40 L50 14 L82 40 Z" fill="#c9a233" stroke="#2b2418" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<circle cx="44" cy="47" r="2.6" fill="#2b2418"/><circle cx="56" cy="47" r="2.6" fill="#2b2418"/><path d="M45 54 q5 4 10 0" fill="none" stroke="#2b2418" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+function partner(){
+  var T = window.Tsukumo;
+  try{
+    if(T && T._state && T._state().partner){
+      var id = T._state().partner, st = T.stageOf(id), c = null;
+      (T._chars || []).forEach(function(x){ if(x.id === id) c = x; });
+      return { svg:T._art(id, st), name: c ? c.n[st] : "相棒", has:true };
+    }
+  }catch(e){}
+  return { svg:travelerSVG(), name:"旅人", has:false };
+}
+function motif(type, x, c){
+  var o = ' opacity=".5"';
+  switch(type){
+    case "take": return '<g class="sway"' + o + '><rect x="' + x + '" y="20" width="9" height="190" rx="3" fill="' + c + '"/><rect x="' + (x+22) + '" y="50" width="7" height="160" rx="3" fill="' + c + '"/>' +
+      '<path d="M' + x + ' 80 h9 M' + x + ' 140 h9 M' + (x+22) + ' 110 h7" stroke="#fff" stroke-width="2"/></g>';
+    case "hashi": return '<g' + o + ' fill="none" stroke="' + c + '" stroke-width="5" stroke-linecap="round"><path d="M' + x + ' 196 l34 -14 l34 14 l34 -14"/><path d="M' + (x+10) + ' 206 q6 -24 14 0 M' + (x+52) + ' 206 q6 -24 14 0" stroke-width="3"/></g>';
+    case "nami": return '<g class="drift"' + o + ' fill="none" stroke="' + c + '" stroke-width="3.5" stroke-linecap="round"><path d="M' + x + ' 196 q14 -16 28 0 t28 0 t28 0"/><path d="M' + (x+14) + ' 212 q14 -16 28 0 t28 0"/></g>';
+    case "hana": return '<g class="drift2"' + o + ' fill="' + c + '"><circle cx="' + (x+10) + '" cy="30" r="7"/><circle cx="' + (x+34) + '" cy="46" r="5"/><circle cx="' + (x+58) + '" cy="26" r="6"/><circle cx="' + (x+24) + '" cy="204" r="5"/><circle cx="' + (x+70) + '" cy="198" r="6"/></g>';
+    case "misu": return '<g class="sway"' + o + ' stroke="' + c + '" stroke-width="2.5"><path d="M' + x + ' 18 h70 M' + x + ' 26 h70 M' + x + ' 34 h70 M' + x + ' 42 h70"/><path d="M' + (x+35) + ' 42 v18" stroke-width="4"/></g>';
+    case "io": return '<g' + o + '><path d="M' + x + ' 196 l30 -24 l30 24 Z" fill="' + c + '"/><rect x="' + (x+8) + '" y="196" width="44" height="18" fill="none" stroke="' + c + '" stroke-width="3"/></g>';
+    case "tanzaku": return '<g class="sway"' + o + '><rect x="' + x + '" y="20" width="14" height="46" rx="2" fill="' + c + '" transform="rotate(-10 ' + x + ' 20)"/><rect x="' + (x+40) + '" y="176" width="14" height="46" rx="2" fill="none" stroke="' + c + '" stroke-width="3" transform="rotate(8 ' + (x+40) + ' 176)"/></g>';
+    default: return '<g class="sway"' + o + ' fill="' + c + '"><path d="M' + (x+14) + ' 214 c-16 -10 -8 -26 0 -36 c2 10 12 12 6 -8 c14 12 18 34 -6 44Z"/><path d="M' + (x+56) + ' 214 c-10 -6 -5 -16 0 -22 c1 6 8 8 4 -5 c9 8 11 21 -4 27Z"/></g>';
+  }
+}
+
+// ---------------------------------------------------------------- 地図
+var curMaki = 0, selId = null, walkFrom = null, freshId = null;
+function renderKiroku(){
+  var p = partner();
+  $("aiboBtn").innerHTML = p.svg;
+  if($("walker")) $("walker").innerHTML = p.svg;
+  $("aiboName").textContent = p.has ? "相棒　" + p.name : "相棒はまだいない";
+  var f = frontier(), done = NODES.filter(function(n){ return stars(n) > 0; }).length;
+  $("kirokuSub").innerHTML = (p.has ? "" : "左の絵をおすと、付喪神をえらべる<br>") + "越えた関 " + done + " / " + NODES.length + "　★ " + totalStars() + " / " + MAX_STARS +
+    (f ? "" : "<br>絵巻のすべての文字を取りもどした");
+  $("tegata").innerHTML = CFG.maki.map(function(m, i){ var g = makiCleared(i); return '<span class="' + (g ? "got" : "") + '" title="' + esc(m.title) + '">' + esc(m.stamp) + "</span>"; }).join("");
+}
+function renderChips(){
+  $("chips").innerHTML = CFG.maki.map(function(m, i){
+    var first = NODES.filter(function(n){ return n.maki === i; })[0], open = isOpen(first);
+    return '<button type="button" data-m="' + i + '" aria-pressed="' + (i === curMaki) + '" class="' + (open ? "" : "locked") + '">' + esc(m.short) +
+      "<small>" + (makiCleared(i) ? "済" : (open ? "旅の途中" : "まだ")) + "</small></button>";
+  }).join("");
+  [].forEach.call($("chips").children, function(b){ b.onclick = function(){ Snd.play("tap"); curMaki = +b.getAttribute("data-m"); selId = null; renderMap(); }; });
+}
+function renderMap(){
+  S.maki = curMaki; save();
+  renderChips();
+  var m = CFG.maki[curMaki], list = NODES.filter(function(n){ return n.maki === curMaki; }), f = frontier();
+  document.documentElement.style.setProperty("--mk", m.color);
+  $("makiHead").innerHTML = "<h2>" + esc(m.title) + '</h2><div class="theme">' + esc(m.theme) + "・関 " + (list.length - 1) + "つ＋ぬし</div><p>" + esc(m.intro) + "</p>";
+  var gap = 104, pad = 62, W = Math.max(pad * 2 + gap * (list.length - 1), 340);
+  var inner = $("emakiInner"); inner.style.width = W + "px";
+  var pts = list.map(function(n, i){ return { x: W - pad - gap * i, y: 100 + Math.round(24 * Math.sin(i * 1.3)) }; });
+  var art = '<svg class="bgart" viewBox="0 0 ' + W + ' 244" preserveAspectRatio="none" aria-hidden="true"><g class="drift">';
+  for(var x = -40; x < W; x += 230) art += '<rect x="' + x + '" y="8" width="150" height="12" rx="6" fill="#c9a233" opacity=".28"/><rect x="' + (x+110) + '" y="222" width="160" height="12" rx="6" fill="#c9a233" opacity=".26"/>';
+  art += '</g><g class="drift2">';
+  for(x = -40; x < W; x += 230) art += '<rect x="' + (x+60) + '" y="24" width="120" height="10" rx="5" fill="#c9a233" opacity=".2"/>';
+  art += "</g>";
+  for(var mx = 24; mx < W - 60; mx += 190) art += motif(m.motif, mx, m.color);
+  art += '<polyline points="' + pts.map(function(p){ return p.x + "," + p.y; }).join(" ") + '" fill="none" stroke="#8a7a52" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round"/></svg>';
+  var h = art, pos = {};
+  list.forEach(function(n, i){
+    pos[n.id] = pts[i];
+    var st = stars(n), open = isOpen(n), cls = "node" + (n.boss ? " boss" : "") + (st ? " done" : (open ? " open" : " lock")) + (f && f.id === n.id ? " now" : "") +
+      (selId === n.id ? " sel" : "") + (freshId === n.id ? " fresh" : "");
+    var face = open ? (n.boss || st ? monster(n, st > 0) : esc(n.glyph)) : "錠";
+    h += '<button type="button" class="' + cls + '" data-id="' + n.id + '" style="right:' + (W - pts[i].x) + "px;top:" + (pts[i].y - 30) + 'px" aria-label="' +
+      esc((n.boss ? "ぬし " + n.enemy : n.label + "の関") + (st ? "。★" + st : (open ? "。挑める" : "。まだ進めない"))) + '">' +
+      '<span class="dot">' + face + '</span><span class="lab">' + esc(n.boss ? n.enemy : n.label) + '</span><span class="st">' + (st ? starText(st) : "") + "</span></button>";
+  });
+  // 相棒は、いま挑む関（すべて越えた巻では、ぬしの所）に立つ
+  var at = (f && f.maki === curMaki) ? f : (makiCleared(curMaki) ? list[list.length - 1] : null);
+  if(at) h += '<div class="walker" id="walker" aria-hidden="true"></div>';
+  inner.innerHTML = h;
+  [].forEach.call(inner.querySelectorAll(".node"), function(b){ b.onclick = function(){ Snd.play("tap"); selId = b.getAttribute("data-id"); renderMap(); }; });
+  if(at){
+    var w = $("walker"), place = function(p){ w.style.right = (W - p.x) + "px"; w.style.top = (p.y - 30 - 40) + "px"; };
+    if(walkFrom && pos[walkFrom] && walkFrom !== at.id){
+      w.style.transition = "none"; place(pos[walkFrom]); void w.offsetWidth; w.style.transition = "";
+      w.classList.add("walking");
+      var k = 0, tick = setInterval(function(){ Snd.play("step"); if(++k >= 4) clearInterval(tick); }, 260);
+      setTimeout(function(){ place(pos[at.id]); }, 250);
+      setTimeout(function(){ w.classList.remove("walking"); Snd.play("open"); }, 1400);
+    }else place(pos[at.id]);
+  }
+  walkFrom = null; freshId = null;
+  renderKiroku();
+  if(!selId){ var d = (f && f.maki === curMaki) ? f : list[0]; selId = d.id; var el = inner.querySelector('[data-id="' + selId + '"]'); if(el) el.classList.add("sel"); scrollToNode(selId); }
+  renderSel();
+}
+function scrollToNode(id){
+  var box = $("emaki"), el = $("emakiInner").querySelector('[data-id="' + id + '"]');
+  if(!el) return;
+  var r = el.getBoundingClientRect(), b = box.getBoundingClientRect();
+  box.scrollLeft += (r.left + r.width / 2) - (b.left + b.width / 2);
+}
+function byId(id){ for(var i=0;i<NODES.length;i++) if(NODES[i].id === id) return NODES[i]; return null; }
+function renderSel(){
+  var n = byId(selId), st = stars(n), open = isOpen(n), h = "";
+  h += '<div class="row"><div class="mon">' + (open ? monster(n, false) : "") + "</div><div><h3>" + esc(n.boss ? "ぬしの間" : n.label + "の関") + "</h3>";
+  if(open){
+    h += "<p>相手：<b>" + esc(n.enemy) + "</b>（力 " + n.hp + "）</p><p>自分の体力：♥ " + n.life + "　" + (n.boss ? (n.fin ? "すべての巻から出る" : "この巻の全部から出る") : "") + "</p>";
+    h += "<p>" + (st ? "記録 " + starText(st) : "まだ越えていない") + "</p>";
+  }else{
+    h += "<p>まだ進めない。手前の関を越えると道が開く。</p>";
+  }
+  h += "</div></div>";
+  if(open) h += '<button type="button" class="btn main wide" id="goBtn">' + (st ? "もう一度挑む" : "挑む") + "</button>";
+  $("selCard").innerHTML = h;
+  if(open) $("goBtn").onclick = function(){ startBattle(n); };
+}
+
+// ---------------------------------------------------------------- 戦いの演出
+function anim(el, cls, ms){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); if(ms) setTimeout(function(){ el.classList.remove(cls); }, ms); }
+function fx(cls, text, css, life){ var d = document.createElement("div"); d.className = cls; if(text) d.textContent = text; d.style.cssText = css || ""; $("fx").appendChild(d); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, life || 900); return d; }
+function center(el){ var r = el.getBoundingClientRect(), s = $("scene").getBoundingClientRect(); return { x:r.left - s.left + r.width / 2, y:r.top - s.top + r.height / 2 }; }
+function burst(pt, color, n, far){
+  for(var i=0;i<n;i++){
+    var a = Math.random() * Math.PI * 2, d = rnd(24, far || 80), sz = rnd(5, 12);
+    fx("p", "", "left:" + pt.x + "px;top:" + pt.y + "px;width:" + sz + "px;height:" + sz + "px;background:" + color + ";--dx:" + (Math.cos(a) * d).toFixed(0) + "px;--dy:" + (Math.sin(a) * d).toFixed(0) + "px;animation-duration:" + rnd(.45, .85).toFixed(2) + "s", 900);
+  }
+}
+function slash(pt, kin, deg){ fx("slash" + (kin ? " kin" : ""), "", "left:" + pt.x + "px;top:" + pt.y + "px;rotate:" + deg + "deg", 400); }
+function ring(pt, ink){ fx("ring" + (ink ? " ink" : ""), "", "left:" + pt.x + "px;top:" + pt.y + "px", 600); }
+function lines(pt){ fx("lines", "", "--cx:" + pt.x.toFixed(0) + "px;--cy:" + pt.y.toFixed(0) + "px", 660); }
+function cutin(){
+  var d = document.createElement("div"); d.className = "cutin";
+  d.innerHTML = '<div class="face">' + B.me.svg + '</div><div class="txt">会心の一撃</div>';
+  $("fx").appendChild(d); setTimeout(function(){ if(d.parentNode) d.parentNode.removeChild(d); }, 830);
+}
+function firework(card, colors){
+  var x = rnd(12, 88), y = rnd(30, 170), c = colors[Math.floor(Math.random() * colors.length)];
+  for(var i=0;i<18;i++){
+    var a = i / 18 * Math.PI * 2, d = rnd(36, 78), p = document.createElement("span"); p.className = "fw";
+    p.style.cssText = "left:" + x + "%;top:" + y + "px;background:" + c + ";color:" + c + ";--dx:" + (Math.cos(a) * d).toFixed(0) + "px;--dy:" + (Math.sin(a) * d).toFixed(0) + "px";
+    card.appendChild(p); (function(q){ setTimeout(function(){ if(q.parentNode) q.parentNode.removeChild(q); }, 1050); })(p);
+  }
+  Snd.play("fire");
+}
+var twT = null;
+function say(t){
+  var el = $("msg"), i = 0; clearInterval(twT); el.textContent = "";
+  twT = setInterval(function(){ i += 2; el.textContent = t.slice(0, i); if(i >= t.length) clearInterval(twT); }, 22);
+}
+function buildScene(n){
+  var m = CFG.maki[n.maki], h = '<div class="sc-strip"><svg viewBox="0 0 1520 232" preserveAspectRatio="none">';
+  for(var x = 0; x < 1520; x += 190) h += motif(m.motif, x + 20, m.color);
+  h += "</svg></div>";
+  for(var i=0;i<6;i++) h += '<span class="kumo" style="top:' + (56 + i * 17 + (i % 2) * 6) + "px;width:" + (70 + (i * 37) % 90) + "px;animation-duration:" + (16 + i * 5) + "s;animation-delay:-" + (i * 7) + 's"></span>';
+  $("scBg").innerHTML = h;
+  $("scene").className = "scene" + (n.boss ? " boss" : "");
+  $("scene").style.setProperty("--mk", m.color);
+  $("scene").style.setProperty("--dash", ($("scene").clientWidth > 420 ? 150 : (n.boss ? 62 : 84)) + "px");
+}
+
+// ---------------------------------------------------------------- 戦い
+var B = null;
+function show(view){
+  ["viewMap","viewBattle","viewResult"].forEach(function(v){ $(v).hidden = v !== view; });
+  document.body.classList.toggle("in-battle", view === "viewBattle");
+  window.scrollTo(0, 0);
+}
+function pickQuestion(){
+  var units = B.node.units, unit = units[Math.floor(Math.random() * units.length)], pool = POOLS[unit] || [];
+  var seen = S.seen[unit] || (S.seen[unit] = []);
+  var cand = [];
+  for(var i=0;i<pool.length;i++){ if(seen.indexOf(i) < 0 && B.used.indexOf(unit + ":" + i) < 0) cand.push(i); }
+  if(!cand.length){ seen.length = 0; for(i=0;i<pool.length;i++){ if(B.used.indexOf(unit + ":" + i) < 0) cand.push(i); } }
+  var idx = cand[Math.floor(Math.random() * cand.length)];
+  seen.push(idx); B.used.push(unit + ":" + idx);
+  var q = pool[idx], order = [0,1,2,3];
+  for(i = order.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t; }
+  return { q:q.q, e:q.e, t:q.t, choices: order.map(function(k){ return q.c[k]; }), ans: order.indexOf(q.a) };
+}
+var wiping = false;
+function startBattle(n){
+  if(wiping) return; wiping = true;
+  var w = document.createElement("div"); w.id = "wipe"; w.innerHTML = "<span>" + (n.boss ? "ぬしの間" : "いざ勝負") + "</span>";
+  document.body.appendChild(w); Snd.play("wipe");
+  setTimeout(function(){ beginBattle(n); }, 360);
+  setTimeout(function(){ if(w.parentNode) w.parentNode.removeChild(w); wiping = false; }, 950);
+}
+function beginBattle(n){
+  B = { node:n, hp:n.hp, life:n.life, streak:0, asked:0, right:0, wrong:[], used:[], cur:null, done:false, me:partner() };
+  $("bTitle").textContent = CFG.maki[n.maki].title + "　" + (n.boss ? "ぬしの間" : n.label + "の関");
+  $("meArt").innerHTML = B.me.svg; $("meName").textContent = B.me.name;
+  $("enArt").innerHTML = monster(n, false); $("enName").textContent = n.enemy;
+  $("meFig").className = "fig me"; $("enFig").className = "fig en"; $("fx").innerHTML = "";
+  show("viewBattle");
+  buildScene(n); drawSnd();
+  $("hpGhost").style.width = "100%";
+  drawStatus(); nextQuestion();
+  anim($("meFig"), "enterme", 600); anim($("enFig"), "enter", 800);
+  anim($("scene"), n.boss ? "flash-k" : "flash-w", 600);
+  if(n.boss){ anim($("scene"), "quake", 500); fx("banner", "ぬ し 現 る", "", 1300); }
+  Snd.play(n.boss ? "boss" : "appear"); buzz(n.boss ? 120 : 40);
+  say(n.boss ? "地ひびきとともに、" + n.enemy + "が姿をあらわした！" : n.enemy + "が行く手をふさいだ！");
+}
+function drawStatus(lostHeart){
+  var n = B.node, h = "";
+  for(var i=0;i<n.life;i++) h += '<span class="' + (i < B.life ? "" : "off") + (lostHeart && i === B.life ? " pop" : "") + '">♥</span>';
+  $("hearts").innerHTML = h; $("hearts").setAttribute("aria-label", "自分の体力 " + B.life + " / " + n.life);
+  var w = Math.max(0, B.hp / n.hp * 100) + "%";
+  $("hpBar").style.width = w; $("hpGhost").style.width = w;
+  $("hpNum").textContent = "力 " + Math.max(0, B.hp) + " / " + n.hp;
+  $("combo").innerHTML = B.streak >= R.comboFrom - 1 && B.hp > 0 && B.life > 0 ? "<b>" + B.streak + "問連続" + (B.streak >= R.comboFrom ? "　会心の一撃つづく" : "　次は会心の一撃") + "</b>" : "";
+  $("meFig").classList.toggle("aura", B.streak >= R.comboFrom - 1 && B.hp > 0);
+  var alive = B.hp > 0 && B.life > 0, fever = alive && B.streak >= R.comboFrom, weak = alive && B.hp <= n.hp * 0.34;
+  $("scene").classList.toggle("fever", fever); $("scene").classList.toggle("danger", alive && B.life === 1); $("enFig").classList.toggle("weak", weak);
+  var tempo = alive ? Math.round((n.boss ? 215 : 255) * (fever || weak ? 0.72 : 1)) : 0;
+  if(tempo !== B.tempo){ B.tempo = tempo; Snd.bgm(tempo); }
+}
+function nextQuestion(){
+  B.cur = pickQuestion(); B.asked++;
+  $("qNo").textContent = "第" + B.asked + "問";
+  $("qText").textContent = B.cur.q;
+  $("choices").innerHTML = B.cur.choices.map(function(c, i){ return '<button type="button" data-i="' + i + '">' + esc(c) + "</button>"; }).join("");
+  [].forEach.call($("choices").children, function(b){ b.onclick = function(){ answer(+b.getAttribute("data-i")); }; });
+  $("fb").innerHTML = ""; $("nextBtn").hidden = true;
+  anim($("qCard"), "fresh", 600);
+}
+function answer(i){
+  var c = B.cur, n = B.node, ok = i === c.ans, btns = $("choices").children;
+  [].forEach.call(btns, function(b, k){ b.disabled = true; if(k === c.ans) b.classList.add("right"); else if(k === i) b.classList.add("wrong"); });
+  S.asked++;
+  var head, en = center($("enFig")), me = center($("meFig"));
+  if(ok){
+    B.right++; B.streak++; S.right++;
+    var crit = B.streak >= R.comboFrom, dmg = crit ? 2 : 1; B.hp -= dmg;
+    head = crit ? "正解！ 会心の一撃（力を2つ減らした）" : "正解！";
+    var d0 = crit ? 620 : 0, dead = B.hp <= 0;
+    if(crit){ cutin(); Snd.play("cut"); }
+    setTimeout(function(){ anim($("meFig"), "dash", 520); }, d0);
+    setTimeout(function(){
+      anim($("enFig"), "struck", 520); slash(en, crit, -38);
+      if(crit){ setTimeout(function(){ slash(en, true, 38); ring(en, true); }, 90); setTimeout(function(){ slash(en, true, 0); }, 180); lines(en); }
+      burst(en, "#2b2418", crit ? 30 : 18, crit ? 150 : 100); burst(en, "#e0b43c", crit ? 24 : 8, crit ? 160 : 90); burst(en, n.color, 8, 90);
+      ring(en, false);
+      fx("kanji" + (crit ? " kin" : ""), crit ? "会心" : "斬", "left:" + en.x + "px;top:" + (en.y - 6) + "px", 800);
+      fx("num" + (crit ? " kin" : ""), "−" + dmg, "left:" + (en.x + 36) + "px;top:" + (en.y - 54) + "px", 950);
+      anim($("scene"), crit ? "flash-k" : "flash-w", 500); anim($("scene"), "quake", 480); if(crit) anim(document.querySelector(".wrap"), "pageshake", 480);
+      Snd.play(crit ? "crit" : "hit"); buzz(crit ? 80 : 30);
+      if(dead) setTimeout(function(){
+        $("enFig").classList.add("gone"); anim($("scene"), "flash-k", 600);
+        fx("pillar", "", "left:" + en.x + "px", 1250); ring(en, false); setTimeout(function(){ ring(en, true); }, 150); setTimeout(function(){ ring(en, false); }, 300);
+        burst(en, n.color, 34, 170); burst(en, "#2b2418", 18, 130); burst(en, "#e0b43c", 22, 180);
+        fx("glyph", n.glyph, "left:" + en.x + "px;top:" + (en.y - 10) + "px", 1500);
+        setTimeout(function(){ fx("kanji kin", "勝", "left:50%;top:50%", 800); anim($("scene"), "quake", 480); Snd.play("stamp"); }, 520);
+        Snd.play("vanish"); buzz(150);
+      }, 420);
+    }, d0 + 230);
+    say(B.hp <= 0 ? n.enemy + "は墨にもどり、「" + n.glyph + "」の字が絵巻へ帰っていく…" :
+        (crit ? "会心の一撃！ " + n.enemy + "の力を2つけずった！" : B.me.name + "のことばが届いた！ " + n.enemy + "の力を1つけずった") + (B.hp <= n.hp * 0.34 ? " あと一息！" : ""));
+  }else{
+    B.streak = 0; B.life--; B.wrong.push({ q:c.q, a:c.choices[c.ans], e:c.e });
+    head = "ざんねん…　体力が1つ減った";
+    anim($("enFig"), "lunge", 560); anim($("meFig"), "hurt", 560);
+    fx("blob", "", "left:" + en.x + "px;top:" + en.y + "px;background:" + n.color + ";--dx:" + (me.x - en.x).toFixed(0) + "px;--dy:" + (me.y - en.y).toFixed(0) + "px", 300);
+    setTimeout(function(){
+      burst(me, n.color, 20, 110); burst(me, "#14110c", 16, 120); ring(me, true);
+      fx("num", "−♥", "left:" + me.x + "px;top:" + (me.y - 40) + "px", 950);
+      for(var z=0;z<5;z++){ var sz = rnd(34, 80).toFixed(0); fx("splat", "", "left:" + rnd(0, 78).toFixed(0) + "%;top:" + rnd(6, 58).toFixed(0) + "%;width:" + sz + "px;height:" + sz + "px;animation-delay:" + (z * .04) + "s", 1700); }
+      anim($("scene"), "flash-r", 650); anim($("scene"), "quake", 480); anim(document.querySelector(".wrap"), "pageshake", 480); Snd.play("miss"); buzz(120);
+      if(B.life <= 0) setTimeout(function(){ $("meFig").classList.add("down"); }, 300);
+    }, 260);
+    say(B.life <= 0 ? n.enemy + "の墨にのまれた… 体力がつきた" : n.enemy + "が飛びかかってきた！ 体力が1つへった");
+  }
+  if(window.Tsukumo) Tsukumo.answer(ok);
+  save(); drawStatus(!ok);
+  $("fb").innerHTML = '<div class="fb' + (ok ? "" : " ng") + '"><div class="head">' + head + "</div>" + (ok ? "" : "<p>正しい答え：<b>" + esc(c.choices[c.ans]) + "</b></p>") +
+    "<p>" + esc(c.e) + "</p>" + (c.t ? '<p class="yaku">現代語訳：' + esc(c.t) + "</p>" : "") + "</div>";
+  var over = B.hp <= 0 || B.life <= 0, nb = $("nextBtn");
+  nb.hidden = false; nb.textContent = over ? (B.hp <= 0 ? "物の怪をしずめた！ 結果を見る" : "結果を見る") : "次の問いへ";
+  nb.onclick = over ? endBattle : function(){ Snd.play("tap"); nextQuestion(); window.scrollTo(0, 0); say(n.enemy + "がこちらをにらんでいる…"); };
+  setTimeout(function(){ try{ nb.scrollIntoView({ block:"nearest", behavior:"smooth" }); }catch(e){} }, ok && B.streak >= R.comboFrom ? 1600 : 1000);
+}
+function endBattle(){
+  if(B.done) return; B.done = true; Snd.bgm(0);
+  var n = B.node, win = B.hp <= 0, miss = B.wrong.length, got = win ? (miss === 0 ? 3 : (miss === 1 ? 2 : 1)) : 0, before = stars(n);
+  var wasCleared = makiCleared(n.maki), firstClear = win && !before;
+  if(got > before) S.clear[n.id] = got;
+  save();
+  if(window.Tsukumo) Tsukumo.finish(B.asked, B.right); else if(window.Riyou) Riyou.finish(B.asked, B.right);
+  var m = CFG.maki[n.maki], next = NODES[n.idx + 1], h = "", stamp = win && n.boss && !wasCleared;
+  if(win){
+    h += '<div class="rays"></div><div class="fig2">' + B.me.svg + "</div><h2>" + esc(n.enemy) + "をしずめた</h2>" + '<div class="stars" aria-label="星' + got + 'つ">';
+    for(var i=0;i<3;i++) h += '<span class="' + (i < got ? "on" : "") + '" style="animation-delay:' + (.35 + i * .3) + 's">★</span>';
+    h += "</div><p>" + B.asked + "問中 " + B.right + "問正解" + (got < before ? "（これまでの記録 " + starText(before) + " はそのまま）" : "") + "</p>";
+    if(stamp) h += '<div class="stampbig">' + esc(m.stamp) + "</div><p>" + esc(m.clear) + "</p>";
+    if(n.fin && !wasCleared) h += "<p>" + esc(CFG.ending) + "</p>";
+    h += '<div class="btns">';
+    if(next) h += '<button type="button" class="btn main" id="rNext">' + (next.maki !== n.maki ? "次の巻へ進む" : (next.boss ? "ぬしの間へ進む" : "次の関へ進む")) + "</button>";
+    if(got < 3) h += '<button type="button" class="btn" id="rRetry">★3をめざしてもう一度</button>';
+    h += '<button type="button" class="btn" id="rMap">地図にもどる</button></div>';
+  }else{
+    h += '<div class="fig2">' + monster(n, false) + "</div><h2>体力がつきた…</h2><p>" + esc(n.enemy) + "の力は、あと " + B.hp + "。" + B.asked + "問中 " + B.right + "問正解。</p>" +
+      "<p>下の解説を読んでから、もう一度挑もう。まちがえた所が、いちばん伸びる所。</p>" +
+      '<div class="btns"><button type="button" class="btn main" id="rRetry">もう一度挑む</button><button type="button" class="btn" id="rMap">地図にもどる</button></div>';
+  }
+  var card = $("resultCard"); card.className = "card result " + (win ? "win" : "lose"); card.innerHTML = h;
+  if(win){
+    for(var k=0;k<(stamp ? 46 : 26);k++){
+      var fl = document.createElement("span"); fl.className = "flake";
+      fl.style.cssText = "left:" + rnd(0, 100).toFixed(0) + "%;width:" + rnd(5, 10).toFixed(0) + "px;height:" + rnd(5, 10).toFixed(0) + "px;animation-duration:" + rnd(1.6, 3.4).toFixed(2) + "s;animation-delay:" + rnd(0, 1.4).toFixed(2) + "s;" + (k % 3 ? "" : "background:" + n.color);
+      card.appendChild(fl);
+    }
+    Snd.play("win");
+    for(var w2=0;w2<(stamp ? 9 : 5);w2++) setTimeout(function(){ if(!$("viewResult").hidden && B.done) firework(card, ["#e0b43c", "#ffe082", n.color, "#d9534f", "#5fb3a1"]); }, 500 + w2 * 420);
+    for(var s2=0;s2<got;s2++) (function(j){ setTimeout(function(){ Snd.play("star"); }, 350 + j * 300 + 700); })(s2);
+    if(stamp) setTimeout(function(){ Snd.play("stamp"); buzz(80); }, 1900);
+  }else Snd.play("down");
+  var rv = $("reviewCard");
+  if(miss){
+    rv.hidden = false;
+    rv.innerHTML = "<h3>まちがえた問い（" + miss + "）</h3>" + B.wrong.map(function(w){
+      return '<div class="item"><div class="q">' + esc(w.q) + '</div><div class="a">正しい答え：' + esc(w.a) + '</div><div class="e">' + esc(w.e) + "</div></div>"; }).join("");
+  }else{ rv.hidden = true; rv.innerHTML = ""; }
+  // 初めて越えたときは、いちど地図にもどって相棒が次の関まで歩く
+  var walk = function(to){ if(firstClear && to){ walkFrom = n.maki === to.maki ? n.id : null; freshId = to.id; } toMap(to || n); };
+  if($("rNext")) $("rNext").onclick = function(){ Snd.play("tap"); if(firstClear || next.maki !== n.maki) walk(next); else startBattle(next); };
+  if($("rRetry")) $("rRetry").onclick = function(){ startBattle(n); };
+  $("rMap").onclick = function(){ Snd.play("tap"); walk(win && next ? next : n); };
+  show("viewResult");
+}
+function toMap(n){ curMaki = n.maki; selId = n.id; show("viewMap"); renderMap(); scrollToNode(selId); $("chips").scrollIntoView(); }
+$("quitBtn").onclick = function(){
+  if(B && !B.done && B.asked > 1 && !window.confirm("この関をやめて地図にもどりますか？（ここまでの戦いは記録されません）")) return;
+  Snd.bgm(0); toMap(B.node);
+};
+$("aiboBtn").onclick = function(){ if(window.Tsukumo) Tsukumo.open(); };
+
+// ---------------------------------------------------------------- はじまり
+$("prologue").textContent = CFG.prologue;
+$("ruleCombo").textContent = R.comboFrom;
+if(!totalStars()) $("story").open = true;
+var f0 = frontier();
+curMaki = f0 ? f0.maki : (S.maki || 0);
+drawSnd();
+renderMap();
+function hookTsukumo(){ if(window.Tsukumo && Tsukumo.onChange) Tsukumo.onChange(function(){ if(!$("viewMap").hidden) renderKiroku(); }); }
+if(document.readyState === "complete") hookTsukumo(); else window.addEventListener("load", hookTsukumo);
+})();
+</script>
+<script src="tsukumo.js" data-subject="kobun"></script>
+<script src="riyou.js" data-site="emaki"></script>
+</body>
+</html>
